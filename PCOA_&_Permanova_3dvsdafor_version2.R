@@ -1,15 +1,20 @@
 library(readxl)
 library(ape)
 library(vegan)
+install.packages("FD")
 library(FD)
 library(dplyr)
 library(ggplot2)
 library(ggsci)
 library(ggrepel)
+install.packages("ggforce")
 library(ggforce)
 library(RColorBrewer)
 
-maindf <- read_excel("~/Documents/IMBRSea/Thesis Brazil/Data Anlaysis/R/3dvsdafor_version2.xlsx")
+maindf <- read_excel("3dvsdafor_version2.xlsx")
+
+maindf
+
 maintranf<-maindf[,-c(1,2)] #remove the columns with sites and observers
 site<-maindf[,-(2:7)] #extracting the sites column
 observers<-maindf[,-c(1,3:7)] #extracting the observers column
@@ -88,13 +93,61 @@ permanova2 <- adonis2(comm ~ observers, data=maindf, method="gower", permutation
 View(permanova2)
 
 ####permanova version2#######
-attach(pv)
-comm <- pv[,3:7]
-beta.comm <- betadisper(gowerdf, group=pv$observers)
-permutest(beta.comm)
-permanova1 <- adonis2(comm ~ observers, data=pv, method="gower", permutations=9999) 
-View(permanova1)
 
-perm.ctrl <- how(blocks=pv$Site, nperm=9999)
-permanova2 <- adonis2(comm ~ observers, data=pv, method="gower", permutations= perm.ctrl)
+#attach(pv) # I dont have the pv object
+#comm <- pv[,3:7]
+#beta.comm <- betadisper(gowerdf, group=pv$observers)
+#permutest(beta.comm)
+#permanova1 <- adonis2(comm ~ observers, data=pv, method="gower", permutations=9999) 
+#View(permanova1)
+
+#perm.ctrl <- how(blocks=pv$Site, nperm=9999)
+#permanova2 <- adonis2(comm ~ observers, data=pv, method="gower", permutations= perm.ctrl)
+#View(permanova2)
+
+
+################################################################################
+
+maindf$observers
+# permanova Adding factor with just field observers and 3d evaluation
+maindf$obs_3D <- c("obs", "obs", "3D", "obs", "obs", "3D","obs","obs", "3D","obs","obs", 
+                       "3D","obs","obs", "3D","obs","obs", "3D","obs","obs","3D","obs", "obs", 
+                       "3D" )
+
+
+comm <- maindf[,3:7]
+beta.comm <- betadisper(gowerdf, group=maindf$obs_3D)
+permutest(beta.comm)
+perm.ctrl <- how(blocks=maindf$Site, nperm=9999)
+permanova3 <- adonis2(comm ~ obs_3D, data=maindf, method="gower", permutations= perm.ctrl) 
+permanova3
+
+# permanova Adding factor with just field observers and 3d evaluation without blocking
+
+
+comm <- maindf[,3:7]
+beta.comm <- betadisper(gowerdf, group=maindf$obs_3D)
+permutest(beta.comm)
+#perm.ctrl <- how(blocks=maindf$Site, nperm=9999)
+permanova4 <- adonis2(comm ~ obs_3D, data=maindf, method="gower") 
+permanova4
+
+
+
 View(permanova2)
+
+# permanova no site block and 2 observers and 3d evaluation
+
+comm <- maindf[,3:7]
+beta.comm <- betadisper(gowerdf, group=maindf$observers)
+permutest(beta.comm)
+permanova5 <- adonis2(comm ~ observers, data=maindf, method="gower") 
+permanova5
+
+
+
+
+
+
+
+
